@@ -27,6 +27,17 @@ app.post('/todos', (request, response) => {
 })
 
 app.get('/todos', (request, response) => {
+    Todo.find()
+        .then(todos => {
+            response.send({
+                todos
+            })
+
+        })
+        .catch(error => {
+            console.log(error)
+            response.status(400).send(error)
+        })
 })
 
 
@@ -39,3 +50,8 @@ app.get('/todos', (request, response) => {
 app.listen(3000, () => {
     console.log(`Server started on port 3000`)
 })
+
+
+module.exports = {
+    app
+}
