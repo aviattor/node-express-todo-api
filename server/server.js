@@ -4,11 +4,16 @@ const bodyParser = require('body-parser')
 const { mongoose } = require('./db/mongoose')
 const { Todo } = require('./models/todo')
 const { User } = require('./models/user')
+const {ObjectID} = require('mongodb')
+
 
 
 const app = express()
 
 app.use(bodyParser.json())
+
+
+// POST /todos
 
 app.post('/todos', (request, response) => {
     const todo = new Todo({
@@ -26,6 +31,9 @@ app.post('/todos', (request, response) => {
 
 })
 
+
+// GET /todos
+
 app.get('/todos', (request, response) => {
     Todo.find()
         .then(todos => {
@@ -38,6 +46,33 @@ app.get('/todos', (request, response) => {
             console.log(error)
             response.status(400).send(error)
         })
+})
+
+
+
+// GET /todos/:id
+
+app.get('/todos/:id', (request, response) => {
+
+    const todoID = request.params.id
+
+    if (!ObjectID.isValid(todoID)) {
+        return response.status(404).send()
+    }
+
+    Todo.findById(todoID)
+        .then(todo => {
+            if (!todo) {
+                return response.status(404).send()
+            }
+            response.send({todo})
+
+        })
+        .catch(error => {
+            response.status(400).send(error)
+
+        })
+
 })
 
 
