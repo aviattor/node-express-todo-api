@@ -1,3 +1,4 @@
+const _ = require('lodash')
 const express = require('express')
 const bodyParser = require('body-parser')
 
@@ -26,8 +27,7 @@ app.post('/todos', (request, response) => {
 
         })
         .catch(error => {
-            response.status(400).send(error)
-            console.log(error)
+            response.status(400).send()
         })
 
 })
@@ -44,8 +44,7 @@ app.get('/todos', (request, response) => {
 
         })
         .catch(error => {
-            console.log(error)
-            response.status(400).send(error)
+            response.status(400).send()
         })
 })
 
@@ -100,7 +99,45 @@ app.delete('/todos/:id', (request, response) => {
 
 })
 
+// PATCH /todos/:id
 
+app.patch('/todos/:id', (request, response) => {
+
+    const todoID = request.params.id
+    const body = _.pick(request.body, ['text', 'completed'])
+
+    if (!ObjectID.isValid(todoID)) {
+        return response.status(404).send()
+    }
+
+    if (_.isBoolean(body.completed) && body.completed) {
+        body.completedAt = new Date().getTime()
+
+    } else {
+        body.completed = false
+        body.completedAt = null
+
+    }
+
+    Todo.findByIdAndUpdate(todoID,{
+        $set: body
+    }, {
+        new: true
+    })
+        .then(todo => {
+            if (!todo) {
+                return response.status(404).send()
+            }
+            response.send({todo})
+
+
+        })
+        .catch(error => {
+            response.status(400).send()
+        })
+
+
+})
 
 
 
