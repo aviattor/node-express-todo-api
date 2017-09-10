@@ -9,6 +9,7 @@ const {ObjectID} = require('mongodb')
 
 
 const app = express()
+const port = process.env.PORT || 3000
 
 app.use(bodyParser.json())
 
@@ -76,14 +77,38 @@ app.get('/todos/:id', (request, response) => {
 })
 
 
+// DELETE /todos/:id
+
+app.delete('/todos/:id', (request, response) => {
+    const todoID = request.params.id
+
+    if (!ObjectID.isValid(todoID)) {
+        return response.status(404).send()
+    }
+
+    Todo.findByIdAndRemove(todoID)
+        .then(todo => {
+            if (!todo) {
+                return response.status(404).send()
+            }
+            response.send({todo})
+        })
+        .catch(error => {
+            response.status(400).send()
+
+        })
+
+})
 
 
 
 
 
 
-app.listen(3000, () => {
-    console.log(`Server started on port 3000`)
+
+
+app.listen(port, () => {
+    console.log(`Server started on port ${port}`)
 })
 
 
