@@ -140,6 +140,34 @@ app.patch('/todos/:id', (request, response) => {
 })
 
 
+// POST /users
+
+app.post('/users', (request, response) => {
+    const body = _.pick(request.body, ['email', 'password'])
+
+    let user = new User(body)
+
+
+
+
+    user.save()
+        .then(() => {
+            return user.generateAuthToken()
+                .then(token => {
+                    response.header('x-auth', token).send(user)
+                })
+                .catch(error => {
+                    response.send(400).send(error)
+                })
+        })
+        .catch(error => {
+            response.status(400).send(error)
+
+        })
+
+})
+
+
 
 
 
