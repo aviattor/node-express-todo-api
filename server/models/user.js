@@ -64,6 +64,17 @@ UserSchema.methods.generateAuthToken = function () {
         .catch()
 }
 
+UserSchema.methods.removeToken = function (token) {
+    const user = this
+    return user.update({
+        $pull: {
+            tokens: {
+                token
+            }
+        }
+    })
+}
+
 
 UserSchema.statics.findByToken = function (token) {
     const User = this
@@ -111,6 +122,8 @@ UserSchema.statics.findByCredentials = function (email, password) {
             reject()
         })
 }
+
+
 
 
 UserSchema.pre('save', function (next) {

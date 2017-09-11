@@ -2,13 +2,12 @@ const _ = require('lodash')
 const express = require('express')
 const bodyParser = require('body-parser')
 
-const { mongoose } = require('./db/mongoose')
-const { Todo } = require('./models/todo')
-const { User } = require('./models/user')
+const {mongoose} = require('./db/mongoose')
+const {Todo} = require('./models/todo')
+const {User} = require('./models/user')
 const {ObjectID} = require('mongodb')
 
 const {authenticate} = require('./middleware/authenticate')
-
 
 
 const app = express()
@@ -49,7 +48,6 @@ app.get('/todos', (request, response) => {
             response.status(400).send()
         })
 })
-
 
 
 // GET /todos/:id
@@ -121,7 +119,7 @@ app.patch('/todos/:id', (request, response) => {
 
     }
 
-    Todo.findByIdAndUpdate(todoID,{
+    Todo.findByIdAndUpdate(todoID, {
         $set: body
     }, {
         new: true
@@ -150,8 +148,6 @@ app.post('/users', (request, response) => {
     let user = new User(body)
 
 
-
-
     user.save()
         .then(() => {
             return user.generateAuthToken()
@@ -168,9 +164,6 @@ app.post('/users', (request, response) => {
         })
 
 })
-
-
-
 
 
 app.get('/users/me', authenticate, (request, response) => {
@@ -199,6 +192,16 @@ app.post('/users/login', (request, response) => {
 
         })
 
+})
+
+app.delete('/users/me/token', authenticate, (request, response) => {
+    request.user.removeToken(request.token)
+        .then(() => {
+            response.status(200).send()
+        })
+        .catch(() => {
+            response.status(400).send()
+        })
 })
 
 
