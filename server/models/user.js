@@ -6,10 +6,8 @@ const _ = require('lodash')
 const bcrypt = require('bcryptjs')
 
 
-
-
 const UserSchema = new mongoose.Schema({
-    versionKey: false ,
+    versionKey: false,
     email: {
         type: String,
         required: true,
@@ -67,7 +65,6 @@ UserSchema.methods.generateAuthToken = function () {
 }
 
 
-
 UserSchema.statics.findByToken = function (token) {
     const User = this
     let decodedToken;
@@ -91,6 +88,30 @@ UserSchema.statics.findByToken = function (token) {
 }
 
 
+UserSchema.statics.findByCredentials = function (email, password) {
+    const User = this
+    return User.findOne({email})
+        .then(user => {
+            if (!user) {
+                return Promise.reject()
+            }
+            return new Promise((resolve, reject) => {
+                bcrypt.compare(password, user.password, (error, result) => {
+                    if (result) {
+                        resolve(user)
+                    } else {
+                        reject()
+                    }
+
+                })
+            })
+
+        })
+        .catch(error => {
+            reject()
+        })
+}
+
 
 UserSchema.pre('save', function (next) {
     const user = this
@@ -109,8 +130,6 @@ UserSchema.pre('save', function (next) {
         next()
     }
 })
-
-
 
 
 const User = mongoose.model('User', UserSchema)

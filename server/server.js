@@ -159,7 +159,7 @@ app.post('/users', (request, response) => {
                     response.header('x-auth', token).send(user)
                 })
                 .catch(error => {
-                    response.send(400).send(error)
+                    response.status(400).send(error)
                 })
         })
         .catch(error => {
@@ -179,9 +179,27 @@ app.get('/users/me', authenticate, (request, response) => {
     response.send(request.user)
 })
 
+// POST /users/login
 
+app.post('/users/login', (request, response) => {
+    const body = _.pick(request.body, ['email', 'password'])
 
+    User.findByCredentials(body.email, body.password)
+        .then(user => {
+            return user.generateAuthToken()
+                .then(token => {
+                    response.header('x-auth', token).send(user)
+                })
+                .catch(error => {
+                    response.status(400).send(error)
+                })
+        })
+        .catch(error => {
+            response.status(400).send()
 
+        })
+
+})
 
 
 app.listen(port, () => {
