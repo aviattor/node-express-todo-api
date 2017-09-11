@@ -7,6 +7,8 @@ const { Todo } = require('./models/todo')
 const { User } = require('./models/user')
 const {ObjectID} = require('mongodb')
 
+const {authenticate} = require('./middleware/authenticate')
+
 
 
 const app = express()
@@ -165,6 +167,16 @@ app.post('/users', (request, response) => {
 
         })
 
+})
+
+
+
+
+
+app.get('/users/me', authenticate, (request, response) => {
+    const token = request.header('x-auth')
+
+    response.send(request.user)
 })
 
 
